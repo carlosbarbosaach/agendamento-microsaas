@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useAuth } from '../../services/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../ConfirmModal';
-import logoCampeche from '../../assets/logo-campeche.avif';
 
 interface Props {
-  onCreate: (date?: Date) => void; // aceita Date opcional
+  onCreate: (date?: Date) => void;
 }
 
 export default function AdminHeader({ onCreate }: Props) {
@@ -19,21 +18,14 @@ export default function AdminHeader({ onCreate }: Props) {
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 items-center bg-white rounded-2xl shadow-sm ring-1 ring-black/5 px-4 py-3">
-      {/* Marca + título */}
-      <div className="flex items-center gap-3 min-w-0">
-        <img
-          src={logoCampeche}
-          alt="Colégio do Campeche"
-          className="h-10 w-auto flex-shrink-0"
-        />
-        <h1 className="text-xl sm:text-2xl font-semibold text-[#3b3b3b] truncate">
-          Painel do Administrador
-        </h1>
-      </div>
+    <div className="flex flex-col sm:flex-row items-center justify-between bg-white rounded-2xl shadow-sm ring-1 ring-black/5 px-4 py-3 gap-3">
+      {/* Título centralizado */}
+      <h1 className="text-xl sm:text-2xl font-semibold text-[#3b3b3b] text-center">
+        Painel do Administrador
+      </h1>
 
-      {/* Ações */}
-      <div className="flex justify-end gap-2">
+      {/* Botões */}
+      <div className="flex gap-2">
         <button
           onClick={() => onCreate(new Date())}
           className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-white font-medium shadow-sm
