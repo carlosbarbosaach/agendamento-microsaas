@@ -8,6 +8,7 @@ import RequestModal from '../components/Requests/RequestModal';
 import SuccessModal from '../components/Feedback/SuccessModal';
 import { listenEvents, addRequest } from '../services/firestore';
 import { CalendarDays, Clock } from 'lucide-react';
+import logoCampeche from '../assets/logo-campeche.avif';
 
 export default function ClientPage() {
   const BRAND = '#672C8E';
@@ -50,13 +51,23 @@ export default function ClientPage() {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-[#f4effa]">
       {/* Faixa de título com a cor da marca */}
       <div className="bg-gradient-to-r from-[#672C8E] to-[#4E1F6A]">
-        <div className="w-full max-w-6xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-semibold text-white">
-            Consulta de Agendamentos
-          </h1>
-          <p className="text-white/80 text-sm">
-            Selecione um dia no calendário para ver os horários disponíveis.
-          </p>
+        <div className="w-full max-w-6xl mx-auto px-4 py-6 flex items-center gap-4">
+          {/* Logo */}
+          <img
+            src={logoCampeche}
+            alt="Colégio do Campeche"
+            className="h-12 w-auto rounded-none"
+          />
+
+          {/* Títulos */}
+          <div>
+            <h1 className="text-2xl font-semibold text-white">
+              Consulta de Agendamentos
+            </h1>
+            <p className="text-white/80 text-sm">
+              Selecione um dia no calendário para ver os horários disponíveis.
+            </p>
+          </div>
         </div>
       </div>
 
