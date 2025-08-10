@@ -10,7 +10,6 @@ import { listenEvents, addRequest } from '../services/firestore';
 
 export default function ClientPage() {
   const BRAND = '#672C8E';
-  const BRAND_DARK = '#4E1F6A';
 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());

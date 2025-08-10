@@ -1,4 +1,3 @@
-// src/components/Calendar/CustomCalendar.tsx
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   addDays, format, isSameMonth, isSameDay,
@@ -72,13 +71,10 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
     return (
       <div
         className="grid grid-cols-7 text-center text-[13px] font-medium text-gray-700 rounded-t-2xl overflow-hidden"
-        style={{ border: '1px solid #672C8E' }} // borda roxa no topo
+        style={{ border: '1px solid #672C8E' }}
       >
         {days.map((day) => (
-          <div
-            key={day}
-            className="py-2 bg-gradient-to-b from-white to-[#faf7ff]"
-          >
+          <div key={day} className="py-2 bg-gradient-to-b from-white to-[#faf7ff]">
             {day}
           </div>
         ))}
@@ -92,8 +88,8 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
     const startDate = startOfWeek(monthStart, { weekStartsOn: 0 });
     const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 });
 
-    const rows: JSX.Element[] = [];
-    let days: JSX.Element[] = [];
+    const rows: React.ReactNode[] = [];
+    let days: React.ReactNode[] = [];
     let day = startDate;
 
     while (day <= endDate) {
@@ -102,13 +98,11 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
         const isToday = isSameDay(day, new Date());
         const isCurrentMonth = isSameMonth(day, monthStart);
 
-        // filtra só eventos com start válido e no mesmo dia
         const eventsForDay = events.filter((e) => {
           const d = safeParseISO(e.start);
           return d ? isSameDay(d, day) : false;
         });
 
-        // ordena de forma segura (inválidos vão pro fim)
         const eventsForDaySorted = [...eventsForDay].sort((a, b) => {
           const da = safeParseISO(a.start);
           const db = safeParseISO(b.start);
@@ -124,7 +118,6 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
             onClick={() => onDateClick?.(cloneDay)}
             className={[
               'p-2 h-28 text-sm cursor-pointer rounded-lg transition-all',
-              // Fundo e borda MAIS VISÍVEIS
               isCurrentMonth
                 ? 'bg-[#f9f8fc] hover:bg-[#672C8E]/8'
                 : 'bg-gray-100 text-gray-400',
@@ -180,7 +173,6 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
       <div
         className="rounded-b-2xl p-2 bg-white"
         style={{
-          // contorno geral mais visível e alinhado à paleta
           border: '1px solid #c6b8d8',
           borderTop: 'none',
         }}
@@ -196,7 +188,6 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
       {renderDaysOfWeek()}
       <AnimatePresence mode="wait">{renderCells()}</AnimatePresence>
 
-      {/* legenda opcional */}
       <div className="mt-3 flex items-center gap-3 text-xs text-gray-600">
         <span className="inline-flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: BRAND }} />
