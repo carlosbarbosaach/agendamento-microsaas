@@ -1,4 +1,3 @@
-// src/components/EventForm/EventListModal.tsx
 import { useEffect, useMemo, useRef } from 'react';
 import type { CalendarEvent } from '../../types';
 import { format, parseISO, compareAsc, isValid as isValidDate } from 'date-fns';
@@ -43,7 +42,6 @@ export default function EventListModal({
 
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Hooks SEMPRE chamados
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -52,7 +50,6 @@ export default function EventListModal({
     return () => window.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]);
 
-  // Garante que 'date' é válido; se não for, usa hoje
   const safeDate = isValidDate(date) ? date : new Date();
 
   const sameDayISO = (d: Date) => format(d, 'yyyy-MM-dd');
@@ -129,17 +126,25 @@ export default function EventListModal({
                 return (
                   <li
                     key={event.id}
-                    className="p-4 rounded-xl bg-white border border-gray-200/80 hover:border-[#672C8E]/30 hover:shadow-sm transition group"
+                    className="p-4 rounded-xl bg-white border border-gray-200/80 hover:border-[#672C8E]/30 hover:shadow-sm transition group cursor-pointer"
                   >
                     <div className="flex justify-between items-start gap-3">
                       <div>
-                        <h3 className="text-base font-semibold text-[#672C8E]">
-                          📌 {event.title}
-                        </h3>
+                        {/* Ícone + título */}
+                        <div className="flex items-center gap-2 mb-1">
+                          <CalendarDays size={18} className="text-[#672C8E]" />
+                          <h3 className="text-base font-semibold text-[#672C8E]">
+                            {event.title}
+                          </h3>
+                        </div>
+
+                        {/* Horário */}
                         <p className="mt-0.5 text-sm text-gray-600 inline-flex items-center gap-1">
                           <Clock size={16} className="opacity-80" />
                           {safeFormat(startD, 'HH:mm')} - {safeFormat(endD, 'HH:mm')}
                         </p>
+
+                        {/* Descrição */}
                         {event.description && (
                           <p className="text-sm mt-1 text-gray-800">{event.description}</p>
                         )}

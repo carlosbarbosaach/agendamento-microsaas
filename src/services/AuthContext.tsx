@@ -1,42 +1,36 @@
-// src/services/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import type { User } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  setPersistence,
+  browserLocalPersistence,
+} from 'firebase/auth';
 import { auth } from './firebase';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import type { User as FirebaseUser } from 'firebase/auth';
 
-type AuthUser = {
-  uid: string;
-  email: string | null;
-};
-
-type AuthContextType = {
-  user: AuthUser | null;
+type Ctx = {
+  user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  login: async () => {},
-  logout: async () => {},
-});
+const AuthCtx = createContext<Ctx>({} as Ctx);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (fbUser: FirebaseUser | null) => {
-      if (fbUser) {
-        setUser({ uid: fbUser.uid, email: fbUser.email });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
+    // Garante que a sessão sobrevive ao refresh
+    setPersistence(auth, browserLocalPersistence).finally(() => {
+      const unsub = onAuthStateChanged(auth, (u) => {
+        setUser(u);
+        setLoading(false);
+      });
+      return () => unsub();
     });
-    return () => unsub();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -48,10 +42,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthCtx.Provider value={{ user, loading, login, logout }}>
       {children}
-    </AuthContext.Provider>
+    </AuthCtx.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthCtx);

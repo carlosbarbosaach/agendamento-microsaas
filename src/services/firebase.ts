@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 // Use variáveis de ambiente (Vite) se quiser ocultar chaves na Vercel
@@ -24,10 +24,3 @@ if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
-// login anônimo automático em DEV/PROD (compatível com suas regras)
-if (typeof window !== 'undefined') {
-  onAuthStateChanged(auth, (u) => {
-    if (!u) signInAnonymously(auth).catch(console.error);
-  });
-}

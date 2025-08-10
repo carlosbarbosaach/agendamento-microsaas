@@ -7,6 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import RequestModal from '../components/Requests/RequestModal';
 import SuccessModal from '../components/Feedback/SuccessModal';
 import { listenEvents, addRequest } from '../services/firestore';
+import { CalendarDays, Clock } from 'lucide-react';
 
 export default function ClientPage() {
   const BRAND = '#672C8E';
@@ -108,16 +109,27 @@ export default function ClientPage() {
                     {dayEventsSorted.map((event) => (
                       <li
                         key={event.id}
-                        className="p-4 rounded-xl bg-white border border-gray-200/80 hover:border-[#672C8E]/30 hover:shadow-sm transition"
+                        className="p-4 rounded-xl bg-white border border-gray-200/80 hover:border-[#672C8E]/40 hover:shadow-md transition cursor-pointer"
                       >
-                        <h3 className="text-base font-semibold text-[#672C8E]">
-                          📌 {event.title}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          🕒 {format(parseISO(event.start), 'HH:mm')} - {format(parseISO(event.end), 'HH:mm')}
-                        </p>
+                        {/* Título do evento */}
+                        <div className="flex items-center gap-2 mb-1">
+                          <CalendarDays size={18} className="text-[#672C8E]" />
+                          <h3 className="text-base font-semibold text-[#672C8E]">
+                            {event.title}
+                          </h3>
+                        </div>
+
+                        {/* Horário */}
+                        <div className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                          <Clock size={16} className="text-gray-500" />
+                          {format(parseISO(event.start), 'HH:mm')} - {format(parseISO(event.end), 'HH:mm')}
+                        </div>
+
+                        {/* Descrição, se existir */}
                         {event.description && (
-                          <p className="text-sm mt-1 text-gray-800">{event.description}</p>
+                          <p className="text-sm text-gray-600 mt-1 leading-snug">
+                            {event.description}
+                          </p>
                         )}
                       </li>
                     ))}
