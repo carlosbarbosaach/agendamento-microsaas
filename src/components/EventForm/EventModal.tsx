@@ -46,7 +46,6 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
       setDescription('');
     }
     setTouched(false);
-    // foco acessível
     setTimeout(() => cancelBtnRef.current?.focus(), 0);
   }, [isOpen, event, selectedDate]);
 
@@ -59,12 +58,13 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen]); // eslint-disable-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, startTime, endTime, professor, turma, description]);
 
   const timeInvalid = useMemo(() => endTime <= startTime, [startTime, endTime]);
   const missingRequired = useMemo(
-    () => !professor.trim() || !turma.trim(),
-    [professor, turma]
+    () => !professor.trim() || !turma.trim() || !description.trim(),
+    [professor, turma, description]
   );
   const isInvalid = timeInvalid || missingRequired;
 
@@ -76,7 +76,7 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
     const newEvent: CalendarEvent = {
       id: event?.id || Date.now().toString(),
       title,
-      description: description.trim() || undefined,
+      description: description.trim(),
       start: `${eventDate}T${startTime}`,
       end: `${eventDate}T${endTime}`,
     };
@@ -88,6 +88,7 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
 
   const fieldBase =
     'w-full border rounded-lg px-3 py-2 text-sm bg-white/90 outline-none transition shadow-sm focus:ring-2 ring-[rgba(103,44,142,0.35)]';
+  const fieldError = 'border-red-400 focus:ring-red-200';
 
   return (
     <div
@@ -122,7 +123,9 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
         {/* Body */}
         <div className="px-5 py-4 space-y-3">
           <div>
-            <label className="block text-sm mb-1">Data</label>
+            <label className="block text-sm mb-1">
+              Data <span className="text-red-500">*</span>
+            </label>
             <input
               type="date"
               className={fieldBase}
@@ -134,21 +137,27 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
 
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-sm mb-1">Início</label>
+              <label className="block text-sm mb-1">
+                Início <span className="text-red-500">*</span>
+              </label>
               <input
                 type="time"
-                className={fieldBase}
+                className={[fieldBase, touched && timeInvalid ? fieldError : ''].join(' ')}
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
+                required
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm mb-1">Fim</label>
+              <label className="block text-sm mb-1">
+                Fim <span className="text-red-500">*</span>
+              </label>
               <input
                 type="time"
-                className={fieldBase}
+                className={[fieldBase, touched && timeInvalid ? fieldError : ''].join(' ')}
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -157,13 +166,16 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
           )}
 
           <div>
-            <label className="block text-sm mb-1">Nome do Professor</label>
+            <label className="block text-sm mb-1">
+              Nome do Professor <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              className={fieldBase}
+              className={[fieldBase, touched && !professor.trim() ? fieldError : ''].join(' ')}
               value={professor}
               onChange={(e) => setProfessor(e.target.value)}
               placeholder="Ex: Prof. João"
+              required
             />
             {touched && !professor.trim() && (
               <p className="text-xs text-red-600 mt-1">Informe o nome do professor.</p>
@@ -171,13 +183,16 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
           </div>
 
           <div>
-            <label className="block text-sm mb-1">Turma</label>
+            <label className="block text-sm mb-1">
+              Turma <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              className={fieldBase}
+              className={[fieldBase, touched && !turma.trim() ? fieldError : ''].join(' ')}
               value={turma}
               onChange={(e) => setTurma(e.target.value)}
               placeholder="Ex: 3ºA / 8ºB / INF-01"
+              required
             />
             {touched && !turma.trim() && (
               <p className="text-xs text-red-600 mt-1">Informe a turma.</p>
@@ -185,14 +200,20 @@ export default function EventModal({ isOpen, onClose, onSave, selectedDate, even
           </div>
 
           <div>
-            <label className="block text-sm mb-1">Descrição (opcional)</label>
+            <label className="block text-sm mb-1">
+              Descrição <span className="text-red-500">*</span>
+            </label>
             <textarea
-              className={fieldBase}
+              className={[fieldBase, touched && !description.trim() ? fieldError : ''].join(' ')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Detalhes do agendamento"
               rows={3}
+              required
             />
+            {touched && !description.trim() && (
+              <p className="text-xs text-red-600 mt-1">Informe a descrição.</p>
+            )}
           </div>
         </div>
 
