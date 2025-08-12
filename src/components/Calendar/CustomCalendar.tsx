@@ -15,8 +15,10 @@ interface Props {
   events?: CalendarEvent[];
 }
 
-const BRAND = '#672C8E';    // roxo do colégio
+const BRAND = '#672C8E';      // roxo do colégio
 const BRAND_DARK = '#4E1F6A';
+const SEL_BORDER = '#8FA396'; // verde (sua paleta)
+const SEL_BG = '#EAF3EF';     // verde bem claro para seleção
 
 function safeParseISO(s?: string) {
   if (!s || typeof s !== 'string') return null;
@@ -68,18 +70,32 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
 
   const renderHeader = () => (
     <div className="relative flex items-center justify-between mb-3">
-      <button
-        aria-label="Mês anterior"
-        onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-[#2b2b2b] hover:bg-black/5 cursor-pointer"
-      >
-        <ChevronLeft size={18} />
-      </button>
+      {/* Navegação à esquerda */}
+      <div className="flex items-center gap-2">
+        <button
+          aria-label="Mês anterior"
+          onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+          className="inline-flex items-center justify-center h-9 w-9 rounded-full text-[#2b2b2b] hover:bg-black/5 cursor-pointer"
+        >
+          <ChevronLeft size={18} />
+        </button>
 
+        {/* Botão Hoje (opcional) */}
+        <button
+          onClick={() => setCurrentMonth(new Date())}
+          className="px-3 py-1.5 rounded-lg text-sm border border-gray-300 hover:bg-gray-50 cursor-pointer"
+          aria-label="Ir para o mês atual"
+        >
+          Hoje
+        </button>
+      </div>
+
+      {/* Mês atual */}
       <h2 className="text-lg sm:text-xl font-semibold text-[#2b2b2b]">
         {prettyMonth}
       </h2>
 
+      {/* Próximo mês */}
       <button
         aria-label="Próximo mês"
         onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
@@ -95,7 +111,6 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
   );
 
   const renderDaysOfWeek = () => {
-    // nomes em PT-BR (curtos, sem ponto)
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     return (
       <div className="grid grid-cols-7 text-center text-[11px] sm:text-[12px] font-medium text-gray-500 mb-1">
@@ -127,24 +142,44 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
         const count = eventsByDay.get(key)?.length ?? 0;
         const hasEvents = count > 0;
 
+        // Estilos do "botão do dia"
         const circleClass = [
-          'flex items-center justify-center rounded-full text-sm font-semibold h-9 w-9 sm:h-10 sm:w-10 transition',
+          'relative flex items-center justify-center rounded-full text-sm font-semibold h-9 w-9 sm:h-10 sm:w-10 transition',
           inMonth ? 'cursor-pointer' : 'cursor-default',
           !inMonth
             ? 'text-gray-300'
-            : isSelected || hasEvents
-              ? 'bg-[#672C8E] text-white'
+            : isSelected
+              // SELEÇÃO ➜ verde suave (não roxo)
+              ? `bg-[${SEL_BG}] text-[#2b2b2b] border-2`
               : isToday
-                ? 'border-2 border-[#672C8E] text-[#672C8E] bg-white'
+                // HOJE ➜ borda roxa e texto roxo
+                ? `border-2 text-[${BRAND}]`
                 : 'text-gray-800 hover:bg-black/5'
         ].join(' ');
 
+        // Borda manual para casos com var() dinâmica
+        const circleStyle: React.CSSProperties = {};
+        if (isSelected) {
+          circleStyle.borderColor = SEL_BORDER;
+          circleStyle.backgroundColor = SEL_BG;
+        } else if (isToday && inMonth && !isSelected) {
+          circleStyle.borderColor = BRAND;
+          circleStyle.backgroundColor = '#ffffff';
+        }
+
         cells.push(
-          <div key={day.toISOString()} className="flex items-center justify-center h-12 sm:h-14">
+          <div key={day.toISOString()} className="flex flex-col items-center justify-center h-12 sm:h-14">
             <button
+              role="gridcell"
+              aria-current={isToday ? 'date' : undefined}
+              aria-label={
+                `${format(day, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}` +
+                (hasEvents ? ` — ${count} agendamento${count > 1 ? 's' : ''}` : '')
+              }
               onClick={() => inMonth && handleDateClick(clone)}
               disabled={!inMonth}
               className={circleClass}
+              style={circleStyle}
               title={
                 hasEvents
                   ? `${count} agendamento${count > 1 ? 's' : ''}`
@@ -153,6 +188,23 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
             >
               {format(day, 'd')}
             </button>
+
+            {/* Indicador sutil: ponto roxo para HOJE (sempre visível) */}
+            {isToday && (
+              <div
+                className="mt-0.5 h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: BRAND }}
+                aria-hidden="true"
+              />
+            )}
+
+            {/* Indicador de eventos: ponto cinza (quando não é hoje) */}
+            {!isToday && hasEvents && (
+              <div
+                className="mt-0.5 h-1.5 w-1.5 rounded-full bg-gray-300"
+                aria-hidden="true"
+              />
+            )}
           </div>
         );
 
@@ -167,7 +219,7 @@ export default function CustomCalendar({ onDateClick, events = [] }: Props) {
       cells = [];
     }
 
-    return <div>{rows}</div>;
+    return <div role="grid">{rows}</div>;
   };
 
   return (

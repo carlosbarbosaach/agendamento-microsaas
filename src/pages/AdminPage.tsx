@@ -9,6 +9,7 @@ import RequestsPanel from '../components/Requests/RequestsPanel';
 import type { CalendarEvent } from '../types';
 import { parseISO } from 'date-fns';
 import { listenEvents, addEvent, updateEvent, deleteEvent } from '../services/firestore';
+import DashboardStats from '../components/Reports/DashboardStats';
 
 export default function AdminPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -101,6 +102,9 @@ export default function AdminPage() {
               </div>
               <div className="p-3 md:p-4">
                 <CustomCalendar events={events} onDateClick={handleClickDay} />
+              </div>
+              <div className="p-3 md:p-4">
+                <DashboardStats events={events} />
               </div>
             </div>
           </div>

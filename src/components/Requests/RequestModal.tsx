@@ -34,7 +34,6 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
       setTurma('');
       setDescription('');
       setTouched(false);
-      // foco acessível
       setTimeout(() => cancelBtnRef.current?.focus(), 0);
     }
   }, [isOpen, selectedDate]);
@@ -44,7 +43,6 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
       if (e.key === 'Enter') {
-        // enter confirma se válido
         if (!isInvalid) handleSubmit();
       }
     };
@@ -52,14 +50,18 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
     return () => window.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]); // eslint-disable-line
 
-  const isTimeInvalid = useMemo(() => {
-    // valida se end > start
-    return end <= start;
-  }, [start, end]);
+  const isTimeInvalid = useMemo(() => end <= start, [start, end]);
 
   const missingRequired = useMemo(() => {
-    return !professor.trim() || !turma.trim();
-  }, [professor, turma]);
+    return (
+      !dateStr.trim() ||
+      !start.trim() ||
+      !end.trim() ||
+      !professor.trim() ||
+      !turma.trim() ||
+      !description.trim()
+    );
+  }, [dateStr, start, end, professor, turma, description]);
 
   const isInvalid = isTimeInvalid || missingRequired;
 
@@ -74,7 +76,7 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
       end,
       professor: professor.trim(),
       turma: turma.trim(),
-      description: description.trim() || undefined,
+      description: description.trim(),
       createdAt: new Date().toISOString(),
     };
     onSubmit(req);
@@ -85,6 +87,12 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
 
   const fieldBase =
     'w-full border rounded-lg px-3 py-2 text-sm bg-white/90 outline-none transition shadow-sm focus:ring-2 ring-[rgba(103,44,142,0.35)]';
+
+  const LabelRequired = ({ children }: { children: string }) => (
+    <label className="block text-sm mb-1">
+      {children} <span className="text-red-500">*</span>
+    </label>
+  );
 
   return (
     <div
@@ -111,18 +119,21 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
         {/* Body */}
         <div className="px-5 py-4 space-y-3">
           <div>
-            <label className="block text-sm mb-1">Data</label>
+            <LabelRequired>Data</LabelRequired>
             <input
               type="date"
               className={fieldBase}
               value={dateStr}
               onChange={(e) => setDateStr(e.target.value)}
             />
+            {touched && !dateStr.trim() && (
+              <p className="text-xs text-red-600 mt-1">Informe a data.</p>
+            )}
           </div>
 
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-sm mb-1">Início</label>
+              <LabelRequired>Início</LabelRequired>
               <input
                 type="time"
                 className={fieldBase}
@@ -131,7 +142,7 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm mb-1">Fim</label>
+              <LabelRequired>Fim</LabelRequired>
               <input
                 type="time"
                 className={fieldBase}
@@ -141,11 +152,13 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
             </div>
           </div>
           {touched && isTimeInvalid && (
-            <p className="text-xs text-red-600">O horário de término deve ser maior que o de início.</p>
+            <p className="text-xs text-red-600">
+              O horário de término deve ser maior que o de início.
+            </p>
           )}
 
           <div>
-            <label className="block text-sm mb-1">Nome do Professor</label>
+            <LabelRequired>Nome do Professor</LabelRequired>
             <input
               type="text"
               className={fieldBase}
@@ -159,7 +172,7 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
           </div>
 
           <div>
-            <label className="block text-sm mb-1">Turma</label>
+            <LabelRequired>Turma</LabelRequired>
             <input
               type="text"
               className={fieldBase}
@@ -173,7 +186,7 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
           </div>
 
           <div>
-            <label className="block text-sm mb-1">Descrição (opcional)</label>
+            <LabelRequired>Descrição</LabelRequired>
             <textarea
               className={fieldBase}
               value={description}
@@ -181,6 +194,9 @@ export default function RequestModal({ isOpen, onClose, selectedDate, onSubmit }
               placeholder="Detalhes do agendamento"
               rows={3}
             />
+            {touched && !description.trim() && (
+              <p className="text-xs text-red-600 mt-1">Informe a descrição do agendamento.</p>
+            )}
           </div>
         </div>
 
