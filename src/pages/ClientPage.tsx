@@ -9,6 +9,7 @@ import SuccessModal from '../components/Feedback/SuccessModal';
 import { listenEvents, addRequest } from '../services/firestore';
 import { CalendarDays, Clock } from 'lucide-react';
 import logoCampeche from '../assets/logo-campeche.avif';
+import { prettyTimeRangeLabel } from '../utils/periods';
 
 export default function ClientPage() {
   const BRAND = '#672C8E';
@@ -49,17 +50,14 @@ export default function ClientPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-[#f4effa]">
-      {/* Faixa de título com a cor da marca */}
+      {/* Header com logo */}
       <div className="bg-gradient-to-r from-[#672C8E] to-[#4E1F6A]">
         <div className="w-full max-w-6xl mx-auto px-4 py-6 flex items-center gap-4">
-          {/* Logo */}
           <img
             src={logoCampeche}
             alt="Colégio do Campeche"
             className="h-12 w-auto rounded-none"
           />
-
-          {/* Títulos */}
           <div>
             <h1 className="text-2xl font-semibold text-white">
               Consulta de Agendamentos
@@ -73,7 +71,7 @@ export default function ClientPage() {
 
       <div className="w-full max-w-6xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Calendário em card */}
+          {/* Calendário */}
           <div className="lg:col-span-7">
             <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
               <div className="border-b border-gray-100 px-4 py-3">
@@ -85,7 +83,7 @@ export default function ClientPage() {
             </div>
           </div>
 
-          {/* Painel do dia selecionado */}
+          {/* Painel do dia */}
           <aside className="lg:col-span-5">
             <div className="sticky top-6 rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
               <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
@@ -109,7 +107,7 @@ export default function ClientPage() {
                 </button>
               </div>
 
-              {/* Lista / estado vazio */}
+              {/* Lista */}
               <div className="p-4">
                 {dayEventsSorted.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-gray-200 p-6 text-sm text-gray-600 text-center">
@@ -122,7 +120,7 @@ export default function ClientPage() {
                         key={event.id}
                         className="p-4 rounded-xl bg-white border border-gray-200/80 hover:border-[#672C8E]/40 hover:shadow-md transition cursor-pointer"
                       >
-                        {/* Título do evento */}
+                        {/* Título */}
                         <div className="flex items-center gap-2 mb-1">
                           <CalendarDays size={18} className="text-[#672C8E]" />
                           <h3 className="text-base font-semibold text-[#672C8E]">
@@ -130,13 +128,16 @@ export default function ClientPage() {
                           </h3>
                         </div>
 
-                        {/* Horário */}
+                        {/* Horário com rótulo de aula/intervalo */}
                         <div className="flex items-center gap-1 text-sm font-medium text-gray-700">
                           <Clock size={16} className="text-gray-500" />
-                          {format(parseISO(event.start), 'HH:mm')} - {format(parseISO(event.end), 'HH:mm')}
+                          {prettyTimeRangeLabel(
+                            format(parseISO(event.start), 'HH:mm'),
+                            format(parseISO(event.end), 'HH:mm')
+                          )}
                         </div>
 
-                        {/* Descrição, se existir */}
+                        {/* Descrição */}
                         {event.description && (
                           <p className="text-sm text-gray-600 mt-1 leading-snug">
                             {event.description}

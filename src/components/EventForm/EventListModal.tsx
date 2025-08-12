@@ -1,7 +1,9 @@
+// src/components/EventForm/EventListModal.tsx
 import { useEffect, useMemo, useRef } from 'react';
 import type { CalendarEvent } from '../../types';
 import { format, parseISO, compareAsc, isValid as isValidDate } from 'date-fns';
 import { Pencil, Trash2, CalendarDays, Clock, X } from 'lucide-react';
+import { prettyTimeRangeLabel } from '../../utils/periods';
 
 interface Props {
   isOpen: boolean;
@@ -123,6 +125,9 @@ export default function EventListModal({
               {dayEventsSorted.map((event) => {
                 const startD = safeParseISO(event.start);
                 const endD = safeParseISO(event.end);
+                const startStr = safeFormat(startD, 'HH:mm');
+                const endStr = safeFormat(endD, 'HH:mm');
+
                 return (
                   <li
                     key={event.id}
@@ -138,10 +143,10 @@ export default function EventListModal({
                           </h3>
                         </div>
 
-                        {/* Horário */}
+                        {/* Horário (com rótulo de aula/intervalo) */}
                         <p className="mt-0.5 text-sm text-gray-600 inline-flex items-center gap-1">
                           <Clock size={16} className="opacity-80" />
-                          {safeFormat(startD, 'HH:mm')} - {safeFormat(endD, 'HH:mm')}
+                          {prettyTimeRangeLabel(startStr, endStr)}
                         </p>
 
                         {/* Descrição */}
